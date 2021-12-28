@@ -2,7 +2,7 @@ package adventofcode.y2021;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +22,6 @@ class DayXTest {
 
     @BeforeEach
     void setUp() {
-        day = new DayX(Arrays.asList(""));
+        day = new DayX(List.of(""));
     }
 }
