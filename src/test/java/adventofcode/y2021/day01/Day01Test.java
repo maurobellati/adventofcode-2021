@@ -1,4 +1,4 @@
-package adventofcode.y2021;
+package adventofcode.y2021.day01;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +20,8 @@ class Day01Test {
 
     @Test
     void part02() {
-        assertThat(day.part2()).isEqualTo(5);
+        assertThat(day.part2forLoop()).isEqualTo(5);
+        assertThat(day.part2withCollector()).isEqualTo(5);
     }
 
     @BeforeEach
@@ -30,7 +31,7 @@ class Day01Test {
                 "199", // i = 0
                 "200", // i = 1
                 "208",
-                "210",
+                "210", // i = 3
                 "200",
                 "207",
                 "240",

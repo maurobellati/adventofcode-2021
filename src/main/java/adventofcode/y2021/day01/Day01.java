@@ -1,9 +1,11 @@
-package adventofcode.y2021;
+package adventofcode.y2021.day01;
 
 import static adventofcode.y2021.Inputs.inputForDay;
 import static java.lang.System.out;
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
@@ -17,23 +19,30 @@ class Day01 {
         @Getter
         private int increases;
 
-        private Integer previous;
+        private final int step;
+
+        private final Deque<Integer> window;
+
+        public MeasurementStats(final int step) {
+            this.step = step;
+            window = new ArrayDeque<>();
+        }
 
         public void accept(final int value) {
-            if (previous == null) {
-                previous = value;
+            if (window.size() < step) {
+                window.addFirst(value);
                 return;
             }
-            if (previous < value) {
+            if (window.pollLast() < value) {
                 increases++;
             }
-            previous = value;
+            window.addFirst(value);
         }
     }
 
-    public static Collector<Integer, MeasurementStats, MeasurementStats> collectingMeaseurements() {
+    public static Collector<Integer, MeasurementStats, MeasurementStats> collectingMeaseurements(final int step) {
         return Collector.of(
-            MeasurementStats::new,
+            () -> new MeasurementStats(step),
             MeasurementStats::accept,
             (x, y) -> {
                 throw new IllegalStateException("not supported");
@@ -60,7 +69,7 @@ class Day01 {
         MeasurementStats stats = inputLines.stream()
             .map(Integer::parseInt)
             .collect(
-                MeasurementStats::new,
+                () -> new MeasurementStats(1),
                 MeasurementStats::accept,
                 (x, y) -> {
                     throw new IllegalStateException("not supported");
@@ -69,7 +78,16 @@ class Day01 {
     }
 
     public long part1withCollector() {
-        MeasurementStats stats = inputLines.stream().map(Integer::parseInt).collect(collectingMeaseurements());
+        MeasurementStats stats = inputLines.stream().map(Integer::parseInt).collect(collectingMeaseurements(1));
+        return stats.getIncreases();
+    }
+
+    public long part2forLoop() {
+        return forLoop(3);
+    }
+
+    public long part2withCollector() {
+        MeasurementStats stats = inputLines.stream().map(Integer::parseInt).collect(collectingMeaseurements(3));
         return stats.getIncreases();
     }
 
@@ -77,17 +95,21 @@ class Day01 {
         // Iterate over the indices
         // State var is defined outside the loop
         // Explicit increment of the state var
-        List<Integer> values = inputLines.stream().map(Integer::parseInt).collect(toList());
-        int increases = 0;
-        for (int i = 1; i < values.size(); i++) {
-            if (values.get(i - 1) < values.get(i)) {
-                increases++;
-            }
-        }
-        return increases;
+        return forLoop(1);
     }
 
     Integer part2() {
         return 0;
+    }
+
+    private long forLoop(final int step) {
+        List<Integer> values = inputLines.stream().map(Integer::parseInt).collect(toList());
+        int increases = 0;
+        for (int i = step; i < values.size(); i++) {
+            if (values.get(i - step) < values.get(i)) {
+                increases++;
+            }
+        }
+        return increases;
     }
 }
