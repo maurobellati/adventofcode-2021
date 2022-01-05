@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString(exclude = {"commandHandlers", "commandParsers"})
 public class Submarine {
     private static final int MAX_DEPTH = 10_000;
 
     private int aim;
+
+    private final List<SubmarineCommandHandler> commandHandlers = new ArrayList<>();
 
     private final List<SubmarineCommandParser> commandParsers = new ArrayList<>();
 
@@ -20,13 +24,21 @@ public class Submarine {
 
     private int position;
 
+    public void addCommandHandler(final SubmarineCommandHandler handler) {
+        commandHandlers.add(handler);
+    }
+
     public void addCommandParser(final SubmarineCommandParser parser) {
         commandParsers.add(parser);
     }
 
     public void handle(final SubmarineCommand command) {
-        command.executeOn(this);
-        System.out.printf("executed: %s -> %s%n", command, this);
+        var handler = commandHandlers.stream()
+            .filter(it -> it.canHandle(command))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("unable to find an handler for " + command));
+        handler.handle(command, this);
+        System.out.println("handled: " + command + " ->" + this);
     }
 
     public void handle(final String command) {

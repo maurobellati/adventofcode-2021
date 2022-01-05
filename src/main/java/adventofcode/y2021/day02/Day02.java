@@ -1,11 +1,9 @@
 package adventofcode.y2021.day02;
 
 import static adventofcode.y2021.Inputs.inputForDay;
-import static java.lang.Integer.parseInt;
 import static java.lang.System.out;
 
 import java.util.List;
-import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 
@@ -20,9 +18,13 @@ class Day02 {
 
     Integer part1() {
         Submarine submarine = new Submarine();
-        submarine.addCommandParser(new ForwardV1CommandParser());
-        submarine.addCommandParser(new DownV1CommandParser());
-        submarine.addCommandParser(new UpV1CommandParser());
+        submarine.addCommandParser(new ForwardCommandParser());
+        submarine.addCommandParser(new DownCommandParser());
+        submarine.addCommandParser(new UpCommandParser());
+
+        submarine.addCommandHandler(new ForwardV1CommandHandler());
+        submarine.addCommandHandler(new UpV1CommandHandler());
+        submarine.addCommandHandler(new DownV1CommandHandler());
         for (String line : inputLines) {
             submarine.handle(line);
         }
@@ -30,24 +32,18 @@ class Day02 {
     }
 
     Integer part2() {
-        int position = 0;
-        int depth = 0;
-        int aim = 0;
+        Submarine submarine = new Submarine();
+        submarine.addCommandParser(new ForwardCommandParser());
+        submarine.addCommandParser(new DownCommandParser());
+        submarine.addCommandParser(new UpCommandParser());
+
+        submarine.addCommandHandler(new ForwardV2CommandHandler());
+        submarine.addCommandHandler(new UpV2CommandHandler());
+        submarine.addCommandHandler(new DownV2CommandHandler());
         for (String line : inputLines) {
-            var tokens = line.split(" ");
-            var command = tokens[0];
-            var arg = parseInt(tokens[1]);
-            switch (command) {
-                case "forward" -> {
-                    position += arg;
-                    depth += aim * arg;
-                }
-                case "down" -> aim += arg;
-                case "up" -> aim -= arg;
-                default -> throw new IllegalStateException("unexpected value: " + command);
-            }
+            submarine.handle(line);
         }
-        return position * depth;
+        return submarine.getPosition() * submarine.getDepth();
     }
 }
 

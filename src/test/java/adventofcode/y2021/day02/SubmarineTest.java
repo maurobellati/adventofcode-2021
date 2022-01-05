@@ -13,7 +13,8 @@ public class SubmarineTest {
 
     @Test
     void aliasesCanBeModifiedAtRuntime() {
-        var forwardV1CommandParser = new ForwardV1CommandParser();
+        submarine.addCommandHandler(new ForwardV1CommandHandler());
+        var forwardV1CommandParser = new ForwardCommandParser();
         submarine.addCommandParser(forwardV1CommandParser);
 
         assertThatIllegalArgumentException().isThrownBy(() -> submarine.handle("ff 1"));
@@ -34,8 +35,10 @@ public class SubmarineTest {
     })
     @ParameterizedTest
     void differentValidations(final String command, final String exceptionMessage) {
-        submarine.addCommandParser(new ForwardV1CommandParser());
-        submarine.addCommandParser(new DownV1CommandParser());
+        submarine.addCommandParser(new ForwardCommandParser());
+        submarine.addCommandHandler(new ForwardV1CommandHandler());
+        submarine.addCommandParser(new DownCommandParser());
+        submarine.addCommandHandler(new DownV1CommandHandler());
         submarine.setDepth(9999);
 
         assertThatIllegalArgumentException()
@@ -45,8 +48,9 @@ public class SubmarineTest {
 
     @Test
     void commandsCanBeAddedAtRuntime() {
+        submarine.addCommandParser(new ForwardCommandParser());
         assertThatIllegalArgumentException().isThrownBy(() -> submarine.handle("forward 1"));
-        submarine.addCommandParser(new ForwardV1CommandParser());
+        submarine.addCommandHandler(new ForwardV1CommandHandler());
 
         submarine.handle("forward 1");
         assertThat(submarine.getPosition()).isEqualTo(1);
@@ -57,60 +61,3 @@ public class SubmarineTest {
         submarine = new Submarine();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// void supportsUndoAndRedo() {
-// submarine.addCommandParser(new ForwardV1CommandParser());
-// assertThat(submarine.canUndo()).isFalse();
-// assertThat(submarine.canRedo()).isFalse();
-//
-// submarine.handle("forward 3");
-// submarine.handle("forward 5");
-//
-// assertThat(submarine.getPosition()).isEqualTo(8);
-// assertThat(submarine.canUndo());
-// assertThat(submarine.canRedo()).isFalse();
-//
-// submarine.undo();
-// assertThat(submarine.getPosition()).isEqualTo(3);
-// assertThat(submarine.canUndo());
-// assertThat(submarine.canRedo());
-//
-// submarine.undo();
-// assertThat(submarine.getPosition()).isEqualTo(0);
-// assertThat(submarine.canUndo()).isFalse();
-// assertThat(submarine.canRedo());
-//
-// submarine.redo();
-// submarine.redo();
-//
-// assertThat(submarine.getPosition()).isEqualTo(8);
-// assertThat(submarine.canUndo());
-// assertThat(submarine.canRedo()).isFalse();
-// }

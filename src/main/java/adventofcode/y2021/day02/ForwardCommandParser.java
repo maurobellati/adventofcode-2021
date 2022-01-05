@@ -8,14 +8,14 @@ import java.util.Set;
 import lombok.ToString;
 
 @ToString
-public class ForwardV1CommandParser implements SubmarineCommandParser {
+public class ForwardCommandParser implements SubmarineCommandParser {
     private final Set<String> names;
 
-    public ForwardV1CommandParser() {
+    public ForwardCommandParser() {
         this(newHashSet("forward"));
     }
 
-    public ForwardV1CommandParser(final Set<String> names) {
+    public ForwardCommandParser(final Set<String> names) {
         this.names = newHashSet(names);
     }
 
@@ -33,7 +33,7 @@ public class ForwardV1CommandParser implements SubmarineCommandParser {
         if (names.contains(tokens[0])) {
             try {
                 return Optional.of(
-                    new ForwardV1Command(Integer.parseInt(tokens[1])));
+                    new ForwardCommand(Integer.parseInt(tokens[1])));
             } catch (final NumberFormatException e) {
                 throw new IllegalArgumentException("illegal syntax or format for input: " + input, e);
             }
