@@ -9,4 +9,9 @@ public class ForwardV1CommandHandler extends SubmarineCommandHandlerBase<Forward
     protected void doHandle(final ForwardCommand command, final Submarine submarine) {
         submarine.setPosition(submarine.getPosition() + command.getDistance());
     }
+
+    @Override
+    protected void doUndo(final ForwardCommand command, final Submarine submarine) {
+        submarine.setPosition(submarine.getPosition() - command.getDistance());
+    }
 }

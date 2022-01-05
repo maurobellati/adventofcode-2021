@@ -56,6 +56,33 @@ public class SubmarineTest {
         assertThat(submarine.getPosition()).isEqualTo(1);
     }
 
+    @Test
+    void undoAndRedo() {
+        submarine.addCommandParser(new ForwardCommandParser());
+        submarine.addCommandHandler(new ForwardV1CommandHandler());
+
+        submarine.handle(new ForwardCommand(1));
+        submarine.handle(new ForwardCommand(2));
+        submarine.handle(new ForwardCommand(3));
+
+        assertThat(submarine.getPosition()).isEqualTo(6);
+
+        submarine.undo();
+        assertThat(submarine.getPosition()).isEqualTo(3);
+
+        submarine.undo();
+        assertThat(submarine.getPosition()).isEqualTo(1);
+
+        submarine.redo();
+        assertThat(submarine.getPosition()).isEqualTo(3);
+
+        submarine.handle(new ForwardCommand(4));
+        assertThat(submarine.getPosition()).isEqualTo(7);
+        
+        assertThat(submarine.getHistory())
+            .containsOnly(new ForwardCommand(1), new ForwardCommand(4));
+    }
+
     @BeforeEach
     void setUp() {
         submarine = new Submarine();

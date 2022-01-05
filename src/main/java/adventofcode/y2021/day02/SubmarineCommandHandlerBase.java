@@ -2,8 +2,6 @@ package adventofcode.y2021.day02;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Preconditions;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -24,4 +22,12 @@ public abstract class SubmarineCommandHandlerBase<T extends SubmarineCommand> im
     }
 
     protected abstract void doHandle(final T command, final Submarine submarine);
+    
+    @Override
+    public void undo(final SubmarineCommand command, final Submarine submarine) {
+        checkArgument(canHandle(command), "unable to handle %s: expected type is %s", command, commandClass);
+        doUndo((T)command, submarine);
+    }
+
+    protected void doUndo(final T command, final Submarine submarine) {}
 }
