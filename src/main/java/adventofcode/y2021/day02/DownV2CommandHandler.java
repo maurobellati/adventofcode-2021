@@ -9,4 +9,9 @@ public class DownV2CommandHandler extends SubmarineCommandHandlerBase<DownComman
     protected void doHandle(final DownCommand command, final Submarine submarine) {
         submarine.setAim(submarine.getAim() + command.getAmount());
     }
+
+    @Override
+    protected void doUndo(final DownCommand command, final Submarine submarine) {
+        submarine.setAim(submarine.getAim() - command.getAmount());
+    }
 }

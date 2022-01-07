@@ -4,8 +4,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Math.max;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 
 import lombok.Data;
 import lombok.ToString;
@@ -22,6 +24,8 @@ public class Submarine {
     private final List<SubmarineCommandParser> commandParsers = new ArrayList<>();
 
     private final List<SubmarineCommand> history = new ArrayList<>();
+    
+    private final Queue<SubmarineCommand> queue = new LinkedList<>();
 
     private int historyHead;
 
@@ -35,6 +39,11 @@ public class Submarine {
 
     public void addCommandParser(final SubmarineCommandParser parser) {
         commandParsers.add(parser);
+    }
+
+    public void enqueue(final SubmarineCommand command) {
+        queue.add(command);
+        System.out.println("enqueued: " + command);
     }
 
     public void handle(final SubmarineCommand command) {
@@ -51,6 +60,12 @@ public class Submarine {
 
     public void handle(final String command) {
         handle(parse(command));
+    }
+
+    public void processQueue() {
+        while (!queue.isEmpty()) {
+            handle(queue.remove());
+        }
     }
 
     public void redo() {

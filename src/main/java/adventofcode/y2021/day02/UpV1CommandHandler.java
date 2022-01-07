@@ -9,4 +9,9 @@ public class UpV1CommandHandler extends SubmarineCommandHandlerBase<UpCommand> {
     protected void doHandle(final UpCommand command, final Submarine submarine) {
         submarine.setDepth(submarine.getDepth() - command.getAmount());
     }
+
+    @Override
+    protected void doUndo(final UpCommand command, final Submarine submarine) {
+        submarine.setDepth(submarine.getDepth() + command.getAmount());
+    }
 }

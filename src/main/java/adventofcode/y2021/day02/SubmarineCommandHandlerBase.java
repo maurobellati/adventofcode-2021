@@ -29,5 +29,5 @@ public abstract class SubmarineCommandHandlerBase<T extends SubmarineCommand> im
         doUndo((T)command, submarine);
     }
 
-    protected void doUndo(final T command, final Submarine submarine) {}
+    protected abstract void doUndo(final T command, final Submarine submarine);
 }

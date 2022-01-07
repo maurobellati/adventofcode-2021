@@ -3,6 +3,10 @@ package adventofcode.y2021.day02;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.util.ArrayDeque;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -54,6 +58,26 @@ public class SubmarineTest {
 
         submarine.handle("forward 1");
         assertThat(submarine.getPosition()).isEqualTo(1);
+    }
+
+    @Test
+    void supportsDeferredExecution() {
+        submarine.addCommandHandler(new ForwardV2CommandHandler());
+        submarine.addCommandHandler(new DownV2CommandHandler());
+        
+        submarine.enqueue(new ForwardCommand(1));
+        submarine.enqueue(new DownCommand(3));
+        submarine.enqueue(new ForwardCommand(5));
+        
+        assertThat(submarine.getPosition()).isEqualTo(0);
+        assertThat(submarine.getAim()).isEqualTo(0);
+        assertThat(submarine.getDepth()).isEqualTo(0);
+        
+        submarine.processQueue();
+        
+        assertThat(submarine.getPosition()).isEqualTo(6);
+        assertThat(submarine.getAim()).isEqualTo(3);
+        assertThat(submarine.getDepth()).isEqualTo(15);
     }
 
     @Test

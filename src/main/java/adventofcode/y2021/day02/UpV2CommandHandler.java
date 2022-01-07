@@ -9,4 +9,9 @@ public class UpV2CommandHandler extends SubmarineCommandHandlerBase<UpCommand> {
     protected void doHandle(final UpCommand command, final Submarine submarine) {
         submarine.setAim(submarine.getAim() - command.getAmount());
     }
+
+    @Override
+    protected void doUndo(final UpCommand command, final Submarine submarine) {
+        submarine.setAim(submarine.getAim() + command.getAmount());
+    }
 }
