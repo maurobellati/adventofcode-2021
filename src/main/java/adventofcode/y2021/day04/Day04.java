@@ -46,13 +46,30 @@ class Day04 {
 
         @Nullable
         private WinningBoard solve(final Board board, final List<Integer> drawnNumbers) {
-            for (int i = 0; i < drawnNumbers.size(); i++) {
+            out.println("solving:");
+            
+            int left = 0;
+            int right = drawnNumbers.size() - 1;
+            
+            do {
+                int i = (left + right) / 2;
+                out.printf("left=%2d, right=%2d, i=%2d", left, right, i);
                 List<Integer> numbers = drawnNumbers.subList(0, i + 1);
                 if (board.isWinner(numbers)) {
-                    return new WinningBoard(board, numbers);
+                    out.println(" *");
+                    right = i;
+                } else {
+                    out.println(" -");
+                    left = i;
                 }
+            } while (right - left > 1);
+            
+            if (right == drawnNumbers.size() - 1 && !board.isWinner(drawnNumbers)) {
+                return null;
             }
-            return null;
+            
+            out.printf("not solvable in %d, solvable in %d%n", left, right);
+            return new WinningBoard(board, drawnNumbers.subList(0, right + 1));
         }
     }
 
