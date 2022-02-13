@@ -1,16 +1,19 @@
 package adventofcode.y2021.day04;
 
 import static adventofcode.y2021.Inputs.inputForDay;
-import static com.google.common.base.Preconditions.checkState;
 import static java.lang.System.out;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,12 +37,22 @@ class Day04 {
             this.boards = new ArrayList<>(boards);
         }
 
-        public List<Board> findWinners(final List<Integer> drawnNumbers) {
-            return boards.stream().filter(board -> board.isWinner(drawnNumbers)).collect(toList());
+        public List<WinningBoard> findWinners(final List<Integer> drawnNumbers) {
+            return boards.stream()
+                .map(board -> solve(board, drawnNumbers))
+                .filter(Objects::nonNull)
+                .collect(toList());
         }
 
-        public void removeBoards(final List<Board> input) {
-            boards.removeAll(input);
+        @Nullable
+        private WinningBoard solve(final Board board, final List<Integer> drawnNumbers) {
+            for (int i = 0; i < drawnNumbers.size(); i++) {
+                List<Integer> numbers = drawnNumbers.subList(0, i + 1);
+                if (board.isWinner(numbers)) {
+                    return new WinningBoard(board, numbers);
+                }
+            }
+            return null;
         }
     }
 
@@ -78,21 +91,38 @@ class Day04 {
         }
     }
 
+    @AllArgsConstructor
+    @Getter
+    public static class WinningBoard {
+        private final Board board;
+
+        private final List<Integer> numbers;
+
+        public int numberSize() {
+            return numbers.size();
+        }
+    }
+
     Integer part1() {
         Bingo bingo = createBingo();
 
         List<Integer> numbersToDraw = parseAsInts(inputLines.get(0), ",");
-        for (int i = 0; i < numbersToDraw.size(); i++) {
-            List<Integer> drawnNumbers = numbersToDraw.subList(0, i + 1);
-            List<Board> winners = bingo.findWinners(drawnNumbers);
-            if (winners.isEmpty()) {
-                out.printf("%s) no winners%n", i);
-            } else {
-                Board winner = winners.get(0);
-                return winnerBoardResult(drawnNumbers, winner);
-            }
-        }
-        return 0;
+        List<WinningBoard> winningBoards = bingo.findWinners(numbersToDraw);
+        WinningBoard bestWinner = winningBoards.stream()
+            .min(Comparator.comparingInt(WinningBoard::numberSize))
+            .orElseThrow(IllegalStateException::new);
+        return winnerBoardResult(bestWinner.getNumbers(), bestWinner.getBoard());
+    }
+
+    Integer part2() {
+        Bingo bingo = createBingo();
+
+        List<Integer> numbersToDraw = parseAsInts(inputLines.get(0), ",");
+        List<WinningBoard> winningBoards = bingo.findWinners(numbersToDraw);
+        WinningBoard leastWinner = winningBoards.stream()
+            .max(Comparator.comparingInt(WinningBoard::numberSize))
+            .orElseThrow(IllegalStateException::new);
+        return winnerBoardResult(leastWinner.getNumbers(), leastWinner.getBoard());
     }
 
     private int winnerBoardResult(final List<Integer> drawnNumbers, final Board winner) {
@@ -117,33 +147,5 @@ class Day04 {
 
     private List<Integer> parseAsInts(final String input, final String separator) {
         return Arrays.stream(input.trim().split(separator)).map(Integer::parseInt).collect(toList());
-    }
-
-    Integer part2() {
-        Bingo bingo = createBingo();
-
-        List<Integer> numbersToDraw = parseAsInts(inputLines.get(0), ",");
-        for (int i = 0; i < numbersToDraw.size(); i++) {
-            List<Integer> drawnNumbers = numbersToDraw.subList(0, i + 1);
-            List<Board> winners = bingo.findWinners(drawnNumbers);
-            if (winners.isEmpty()) {
-                out.printf("%s) no winners%n", i);
-                continue;
-            }
-
-            out.printf("%s) winners(%s): %s%n", i, winners.size(), winners);
-
-            List<Board> boardsLeft = bingo.getBoards();
-            if (boardsLeft.size() == 1) {
-                Board leastWinner = boardsLeft.get(0);
-                checkState(winners.size() == 1 && winners.get(0).equals(leastWinner), "something wrong: %s", boardsLeft);
-
-                return winnerBoardResult(drawnNumbers, leastWinner);
-            }
-
-            bingo.removeBoards(winners);
-            out.printf("  removing winners. Boards left: %s%n", bingo.getBoards().size());
-        }
-        return 0;
     }
 }
